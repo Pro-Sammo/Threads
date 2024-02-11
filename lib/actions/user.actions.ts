@@ -45,7 +45,7 @@ export async function updateUser({
   }
 }
 
-export async function fetchUser(userId:string){
+export async function fetchUser(userId: string) {
   try {
     connectToDB();
 
@@ -59,7 +59,6 @@ export async function fetchUserPosts(userId: string) {
   try {
     connectToDB();
 
-   
     const threads = await User.findOne({ id: userId }).populate({
       path: "threads",
       model: Thread,
@@ -67,7 +66,7 @@ export async function fetchUserPosts(userId: string) {
         {
           path: "community",
           model: Community,
-          select: "name id image _id", 
+          select: "name id image _id",
         },
         {
           path: "children",
@@ -75,7 +74,7 @@ export async function fetchUserPosts(userId: string) {
           populate: {
             path: "author",
             model: User,
-            select: "name image id", 
+            select: "name image id",
           },
         },
       ],
@@ -103,13 +102,12 @@ export async function fetchUsers({
   try {
     connectToDB();
 
-  
     const skipAmount = (pageNumber - 1) * pageSize;
-  
+
     const regex = new RegExp(searchString, "i");
 
     const query: FilterQuery<typeof User> = {
-      id: { $ne: userId }, 
+      id: { $ne: userId },
     };
 
     if (searchString.trim() !== "") {
@@ -139,16 +137,40 @@ export async function fetchUsers({
   }
 }
 
+export async function fetchRightSiderUser({
+  pageNumber = 1,
+  pageSize = 20,
+}: {
+  pageNumber: number;
+  pageSize: number;
+}) {
+  try {
+    connectToDB()
+    const skipAmount = (pageNumber - 1) * pageSize;
+    const usersQuery = User.find()
+      .skip(skipAmount)
+      .limit(pageSize);
+
+
+      const users = await usersQuery.exec();
+  
+      return { users };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+}
+
 export async function getActivity(userId: string) {
   try {
     connectToDB();
-   
+
     const userThreads = await Thread.find({ author: userId });
-    
+
     const childThreadIds = userThreads.reduce((acc, userThread) => {
       return acc.concat(userThread.children);
     }, []);
-  
+
     const replies = await Thread.find({
       _id: { $in: childThreadIds },
       author: { $ne: userId },
