@@ -8,7 +8,7 @@ import { currentUser } from "@clerk/nextjs";
 
 const RightSideBar = async () => {
   const user =await currentUser()
-  console.log(user)
+
   const commu = await fetchCommunities({
     pageNumber: 1,
     pageSize: 20,
@@ -20,7 +20,7 @@ const RightSideBar = async () => {
   });
   return (
     <section className="custom-scrollbar rightsidebar">
-      <div className="flex flex-1 flex-col justify-start">
+      <div className="flex flex-1 flex-col justify-start overflow-y-scroll">
         <h3 className="text-heading4-medium text-light-1 mb-3">
         Suggested Communities
         </h3>
@@ -36,7 +36,7 @@ const RightSideBar = async () => {
             );
           })}
       </div>
-      <div className="flex flex-1 flex-col justify-start">
+      <div className="flex flex-1 flex-col justify-start overflow-y-scroll">
         <h3 className="text-heading4-medium text-light-1 mb-3">Suggested Users</h3>
         {users.users.filter((u)=>u?.id!==user?.id).map((person) => (
           <RightSideUserCard
